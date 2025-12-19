@@ -9,14 +9,14 @@
  * @returns {*} 清理后的输入
  */
 function sanitizeInput(input) {
-  if (typeof input === 'string') {
+  if (typeof input === "string") {
     // 转义HTML特殊字符以防止XSS攻击
     return input
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#x27;')
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#x27;")
       .trim();
   }
   return input;
@@ -28,14 +28,14 @@ function sanitizeInput(input) {
  * @returns {*} 清理后的对象
  */
 function sanitizeObject(obj) {
-  if (typeof obj === 'object' && obj !== null) {
+  if (typeof obj === "object" && obj !== null) {
     // 创建新对象避免修改原始对象
     const sanitizedObj = Array.isArray(obj) ? [] : {};
     for (const key in obj) {
       if (obj.hasOwnProperty(key)) {
-        if (typeof obj[key] === 'string') {
+        if (typeof obj[key] === "string") {
           sanitizedObj[key] = sanitizeInput(obj[key]);
-        } else if (typeof obj[key] === 'object') {
+        } else if (typeof obj[key] === "object") {
           sanitizedObj[key] = sanitizeObject(obj[key]);
         } else {
           sanitizedObj[key] = obj[key];
@@ -82,5 +82,5 @@ module.exports = {
   sanitizeQuery,
   sanitizeParams,
   sanitizeInput,
-  sanitizeObject
+  sanitizeObject,
 };

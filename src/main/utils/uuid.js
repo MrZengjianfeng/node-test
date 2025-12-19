@@ -1,4 +1,4 @@
-const { v4: uuidv4 } = require('uuid');
+const { v4: uuidv4 } = require("uuid");
 
 /**
  * 生成UUID v4版本的唯一标识符
@@ -13,7 +13,7 @@ function generateUUID() {
  * @returns {string} 不带连字符的UUID字符串
  */
 function generateUUIDWithoutHyphens() {
-  return uuidv4().replace(/-/g, '');
+  return uuidv4().replace(/-/g, "");
 }
 
 /**
@@ -29,12 +29,12 @@ function generateUUIDUpperCase() {
  * @returns {string} 大写且不带连字符的UUID字符串
  */
 function generateUUIDUpperCaseWithoutHyphens() {
-  return uuidv4().replace(/-/g, '').toUpperCase();
+  return uuidv4().replace(/-/g, "").toUpperCase();
 }
 
 module.exports = {
   generateUUID,
   generateUUIDWithoutHyphens,
   generateUUIDUpperCase,
-  generateUUIDUpperCaseWithoutHyphens
+  generateUUIDUpperCaseWithoutHyphens,
 };

@@ -9,7 +9,7 @@ const dangerousSqlPatterns = [
   /--/g,
   /\/\*/g,
   /\*\//g,
-  /;/g
+  /;/g,
 ];
 
 /**
@@ -18,10 +18,10 @@ const dangerousSqlPatterns = [
  * @returns {boolean} 是否包含风险
  */
 function detectSqlInjectionRisk(input) {
-  if (typeof input !== 'string') {
+  if (typeof input !== "string") {
     return false;
   }
-  
+
   // 检查是否包含危险的关键字组合
   for (const pattern of dangerousSqlPatterns) {
     if (pattern.test(input)) {
@@ -39,16 +39,16 @@ function detectSqlInjectionRisk(input) {
  * @param {string} path - 对象路径（用于递归调用）
  * @returns {boolean} 是否包含风险
  */
-function deepDetectSqlInjection(obj, path = '') {
+function deepDetectSqlInjection(obj, path = "") {
   if (obj === null || obj === undefined) {
     return false;
   }
-  
-  if (typeof obj === 'string') {
+
+  if (typeof obj === "string") {
     return detectSqlInjectionRisk(obj);
   }
-  
-  if (typeof obj === 'object') {
+
+  if (typeof obj === "object") {
     for (const key in obj) {
       if (obj.hasOwnProperty(key)) {
         const currentPath = path ? `${path}.${key}` : key;
@@ -58,7 +58,7 @@ function deepDetectSqlInjection(obj, path = '') {
       }
     }
   }
-  
+
   return false;
 }
 
@@ -70,7 +70,8 @@ function protectBodyFromSqlInjection(req, res, next) {
     return res.status(400).json({
       code: 400,
       data: null,
-      message: 'Request blocked: Potential SQL injection detected in request body'
+      message:
+        "Request blocked: Potential SQL injection detected in request body",
     });
   }
   next();
@@ -84,7 +85,8 @@ function protectQueryFromSqlInjection(req, res, next) {
     return res.status(400).json({
       code: 400,
       data: null,
-      message: 'Request blocked: Potential SQL injection detected in query parameters'
+      message:
+        "Request blocked: Potential SQL injection detected in query parameters",
     });
   }
   next();
@@ -98,7 +100,8 @@ function protectParamsFromSqlInjection(req, res, next) {
     return res.status(400).json({
       code: 400,
       data: null,
-      message: 'Request blocked: Potential SQL injection detected in URL parameters'
+      message:
+        "Request blocked: Potential SQL injection detected in URL parameters",
     });
   }
   next();
@@ -109,5 +112,5 @@ module.exports = {
   protectQueryFromSqlInjection,
   protectParamsFromSqlInjection,
   detectSqlInjectionRisk,
-  deepDetectSqlInjection
+  deepDetectSqlInjection,
 };

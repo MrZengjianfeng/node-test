@@ -1,7 +1,7 @@
-const mysql = require('mysql2/promise');
+const mysql = require("mysql2/promise");
 
 // 根据环境变量确定数据库配置
-const isReadWriteSplitEnabled = process.env.DB_READ_WRITE_SPLIT === 'true';
+const isReadWriteSplitEnabled = process.env.DB_READ_WRITE_SPLIT === "true";
 
 let masterPool, slavePool;
 
@@ -22,7 +22,7 @@ if (isReadWriteSplitEnabled) {
     idleTimeout: 60000,
     keepAliveInitialDelay: 10000,
     enableKeepAlive: true,
-    resetAfterUse: true
+    resetAfterUse: true,
   });
 
   // 从库配置（用于读操作）
@@ -41,7 +41,7 @@ if (isReadWriteSplitEnabled) {
     idleTimeout: 60000,
     keepAliveInitialDelay: 10000,
     enableKeepAlive: true,
-    resetAfterUse: true
+    resetAfterUse: true,
   });
 } else {
   // 单数据库配置
@@ -60,40 +60,40 @@ if (isReadWriteSplitEnabled) {
     idleTimeout: 60000,
     keepAliveInitialDelay: 10000,
     enableKeepAlive: true,
-    resetAfterUse: true
+    resetAfterUse: true,
   });
-  
+
   // 如果未启用读写分离，则slavePool指向masterPool
   slavePool = masterPool;
 }
 
 // 监听连接事件
-masterPool.on('connection', (connection) => {
-  console.log('Master Database Connection established');
+masterPool.on("connection", (connection) => {
+  console.log("Master Database Connection established");
 });
 
-masterPool.on('release', (connection) => {
-  console.log('Master Connection %d released', connection.threadId);
+masterPool.on("release", (connection) => {
+  console.log("Master Connection %d released", connection.threadId);
 });
 
-slavePool.on('connection', (connection) => {
-  console.log('Slave Database Connection established');
+slavePool.on("connection", (connection) => {
+  console.log("Slave Database Connection established");
 });
 
-slavePool.on('release', (connection) => {
-  console.log('Slave Connection %d released', connection.threadId);
+slavePool.on("release", (connection) => {
+  console.log("Slave Connection %d released", connection.threadId);
 });
 
-masterPool.on('error', (err) => {
-  console.error('Master Database pool error:', err);
+masterPool.on("error", (err) => {
+  console.error("Master Database pool error:", err);
 });
 
-slavePool.on('error', (err) => {
-  console.error('Slave Database pool error:', err);
+slavePool.on("error", (err) => {
+  console.error("Slave Database pool error:", err);
 });
 
 module.exports = {
   masterPool,
   slavePool,
-  isReadWriteSplitEnabled
+  isReadWriteSplitEnabled,
 };

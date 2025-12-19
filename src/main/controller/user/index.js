@@ -1,85 +1,88 @@
-const express = require('express');
-const userService = require('../../service/userService');
-const { userValidators } = require('../../middleware/validation');
+const express = require("express");
+const userService = require("../../service/userService");
+const { userValidators } = require("../../middleware/validation");
 const router = express.Router();
 
 // 获取用户列表
-router.get('/list', async (req, res) => {
+router.get("/list", async (req, res) => {
   try {
     const userList = await userService.getUserList();
-    console.log('userList:', userList)
+    console.log("userList:", userList);
     res.json({
       code: 200,
       data: userList,
-      message: 'Success'
+      message: "Success",
     });
   } catch (error) {
     res.status(500).json({
       code: 500,
       data: null,
-      message: error.message
+      message: error.message,
     });
   }
 });
 
 // 分页获取用户列表
-router.get('/listPage', userValidators.listPage, async (req, res) => {
+router.get("/listPage", userValidators.listPage, async (req, res) => {
   try {
     const { page = 1, size = 10 } = req.sanitizedQuery; // 使用清理后的查询参数
-    const result = await userService.getUserListPage(parseInt(page), parseInt(size));
+    const result = await userService.getUserListPage(
+      parseInt(page),
+      parseInt(size)
+    );
 
     res.json({
       code: 200,
       data: result,
-      message: 'Success'
+      message: "Success",
     });
   } catch (error) {
     res.status(500).json({
       code: 500,
       data: null,
-      message: error.message
+      message: error.message,
     });
   }
 });
 
 // 根据账单状态分组用户
-router.get('/groupByBillStatus', async (req, res) => {
+router.get("/groupByBillStatus", async (req, res) => {
   try {
     const groupedData = await userService.getUsersGroupedByBillStatus();
 
     res.json({
       code: 200,
       data: groupedData,
-      message: 'Success'
+      message: "Success",
     });
   } catch (error) {
     res.status(500).json({
       code: 500,
       data: null,
-      message: error.message
+      message: error.message,
     });
   }
 });
 
 // 保存用户信息数组
-router.post('/doSave', userValidators.saveUserArray, async (req, res) => {
+router.post("/doSave", userValidators.saveUserArray, async (req, res) => {
   try {
     // 使用经过验证和清理的数据
     const userArray = req.sanitizedBody; // 使用清理后的请求体
-    
+
     // 调用服务保存用户数组
     const result = await userService.saveUserArray(userArray);
-    
+
     res.json({
       code: 200,
       data: result,
-      message: 'Users saved successfully'
+      message: "Users saved successfully",
     });
   } catch (error) {
     res.status(500).json({
       code: 500,
       data: null,
-      message: error.message
+      message: error.message,
     });
   }
 });
