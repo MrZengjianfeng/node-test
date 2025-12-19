@@ -3,7 +3,7 @@ const orderService = require('../../service/orderService');
 const router = express.Router();
 
 // 获取订单列表
-router.get('/order/list', async (req, res) => {
+router.get('/list', async (req, res) => {
   try {
     const orderList = await orderService.getOrderList();
     res.json({
@@ -21,7 +21,7 @@ router.get('/order/list', async (req, res) => {
 });
 
 // 获取订单详情
-router.get('/order/detail/:id', async (req, res) => {
+router.get('/detail/:id', async (req, res) => {
   try {
     const orderId = req.params.id;
     const orderDetail = await orderService.getOrderById(orderId);
@@ -49,7 +49,7 @@ router.get('/order/detail/:id', async (req, res) => {
 });
 
 // 创建订单
-router.post('/order/create', async (req, res) => {
+router.post('/create', async (req, res) => {
   try {
     const orderData = req.body;
     const result = await orderService.createOrder(orderData);
@@ -69,7 +69,7 @@ router.post('/order/create', async (req, res) => {
 });
 
 // 更新订单
-router.put('/order/update/:id', async (req, res) => {
+router.put('/update/:id', async (req, res) => {
   try {
     const orderId = req.params.id;
     const orderData = req.body;

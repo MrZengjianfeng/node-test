@@ -4,7 +4,7 @@ const { userValidators } = require('../../middleware/validation');
 const router = express.Router();
 
 // 获取用户列表
-router.get('/user/list', async (req, res) => {
+router.get('/list', async (req, res) => {
   try {
     const userList = await userService.getUserList();
     console.log('userList:', userList)
@@ -23,7 +23,7 @@ router.get('/user/list', async (req, res) => {
 });
 
 // 分页获取用户列表
-router.get('/user/listPage', userValidators.listPage, async (req, res) => {
+router.get('/listPage', userValidators.listPage, async (req, res) => {
   try {
     const { page = 1, size = 10 } = req.query;
     const result = await userService.getUserListPage(parseInt(page), parseInt(size));
@@ -43,7 +43,7 @@ router.get('/user/listPage', userValidators.listPage, async (req, res) => {
 });
 
 // 根据账单状态分组用户
-router.get('/user/groupByBillStatus', async (req, res) => {
+router.get('/groupByBillStatus', async (req, res) => {
   try {
     const groupedData = await userService.getUsersGroupedByBillStatus();
 
@@ -62,7 +62,7 @@ router.get('/user/groupByBillStatus', async (req, res) => {
 });
 
 // 保存用户信息数组
-router.post('/user/doSave', userValidators.saveUserArray, async (req, res) => {
+router.post('/doSave', userValidators.saveUserArray, async (req, res) => {
   try {
     // 获取请求体中的用户数组
     const userArray = req.body;

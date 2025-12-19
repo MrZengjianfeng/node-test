@@ -126,8 +126,9 @@ src/
 
 ### 订单相关接口
 - `GET /api/order/list` - 获取订单列表
-- `GET /api/order/listPage?page=1&size=10` - 分页获取订单列表
-- `GET /api/order/groupByBillStatus` - 根据账单状态分组订单
+- `GET /api/order/detail/:id` - 获取订单详情
+- `POST /api/order/create` - 创建订单
+- `PUT /api/order/update/:id` - 更新订单
 
 ### 系统相关接口
 - `GET /api/system/list` - 获取系统列表

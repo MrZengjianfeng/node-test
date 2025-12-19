@@ -3,7 +3,7 @@ const systemService = require('../../service/systemService');
 const router = express.Router();
 
 // 获取系统列表
-router.get('/system/list', (req, res) => {
+router.get('/list', (req, res) => {
   try {
     const systemList = systemService.getSystemList();
 
@@ -22,7 +22,7 @@ router.get('/system/list', (req, res) => {
 });
 
 // 分页获取系统列表
-router.get('/system/listPage', (req, res) => {
+router.get('/listPage', (req, res) => {
   try {
     const { page = 1, size = 10 } = req.query;
     const result = systemService.getSystemListPage(parseInt(page), parseInt(size));
@@ -42,7 +42,7 @@ router.get('/system/listPage', (req, res) => {
 });
 
 // 根据状态分组系统信息
-router.get('/system/groupByBillStatus', (req, res) => {
+router.get('/groupByBillStatus', (req, res) => {
   try {
     const groupedData = systemService.getSystemsGroupedByStatus();
 
