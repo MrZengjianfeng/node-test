@@ -7,7 +7,11 @@ async function initDatabase() {
     // 获取主库连接并执行查询
     connection = await masterPool.getConnection();
     const [rows] = await connection.query('SELECT 1');
-    console.log('Master database initialized successfully');
+    if (rows.length > 0){
+      console.log('Master database initialized successfully');
+    }else {
+      console.log('Master database initialized Failed');
+    }
   } catch (error) {
     console.error('Failed to initialize master database:', error.message);
   } finally {
@@ -19,7 +23,11 @@ async function initDatabase() {
     try {
       connection = await slavePool.getConnection();
       const [rows] = await connection.query('SELECT 1');
-      console.log('Slave database initialized successfully');
+      if (rows.length > 0) {
+        console.log('Slave database initialized successfully');
+      }else {
+        console.log('Slave database initialized Failed');
+      }
     } catch (error) {
       console.error('Failed to initialize slave database:', error.message);
     } finally {
