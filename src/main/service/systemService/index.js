@@ -1,3 +1,6 @@
+// 导入数据库读写工具，为将来添加真实数据库操作做准备
+// const { executeRead, executeWrite } = require('../../utils/dbReadWrite');
+
 class SystemService {
     // 获取系统列表
     getSystemList() {
@@ -43,6 +46,35 @@ class SystemService {
 
         return groupedData;
     }
+    
+    /*
+     * 如果需要添加真实的数据库操作，可以参考以下方式：
+     * 
+     * // 获取系统列表（真实数据库操作示例）
+     * async getSystemList() {
+     *   try {
+     *     // 使用 executeRead 进行读操作
+     *     const rows = await executeRead('SELECT * FROM systems');
+     *     return rows;
+     *   } catch (error) {
+     *     throw new Error('Failed to fetch system list: ' + error.message);
+     *   }
+     * }
+     *
+     * // 更新系统信息（真实数据库操作示例）
+     * async updateSystem(systemId, systemData) {
+     *   try {
+     *     // 使用 executeWrite 进行写操作
+     *     const result = await executeWrite(
+     *       'UPDATE systems SET name=?, status=? WHERE id=?',
+     *       [systemData.name, systemData.status, systemId]
+     *     );
+     *     return result;
+     *   } catch (error) {
+     *     throw new Error('Failed to update system: ' + error.message);
+     *   }
+     * }
+     */
 }
 
 module.exports = new SystemService();

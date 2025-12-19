@@ -1,37 +1,99 @@
 const mysql = require('mysql2/promise');
 
-// 创建连接池
-const pool = mysql.createPool({
-  host: '120.26.113.17',
-  port: 3306,
-  user: 'root',
-  password: '123456',
-  database: 'test', // 如果有特定的数据库名，请修改此处
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0,
-  acquireTimeout: 60000, // 60秒获取连接超时
-  connectTimeout: 30000, // 30秒连接超时
-  timeout: 60000, // 60秒查询超时
-  idleTimeout: 60000, // 60秒空闲连接超时
-  keepAliveInitialDelay: 10000, // 10秒后发送keep-alive包
-  enableKeepAlive: true, // 启用TCP keep-alive
-  resetAfterUse: true // 使用后重置连接
+// 根据环境变量确定数据库配置
+const isReadWriteSplitEnabled = process.env.DB_READ_WRITE_SPLIT === 'true';
+
+let masterPool, slavePool;
+
+if (isReadWriteSplitEnabled) {
+  // 主库配置（用于写操作）
+  masterPool = mysql.createPool({
+    host: process.env.DB_MASTER_HOST || '120.26.113.14',
+    port: process.env.DB_MASTER_PORT || 3306,
+    user: process.env.DB_MASTER_USER || 'app_write',
+    password: process.env.DB_MASTER_PASSWORD || 'StrongPassword456!',
+    database: process.env.DB_NAME || 'nodeBase',
+    waitForConnections: true,
+    connectionLimit: process.env.DB_MASTER_CONNECTION_LIMIT || 10,
+    queueLimit: 10,
+    acquireTimeout: 60000,
+    connectTimeout: 30000,
+    timeout: 60000,
+    idleTimeout: 60000,
+    keepAliveInitialDelay: 10000,
+    enableKeepAlive: true,
+    resetAfterUse: true
+  });
+
+  // 从库配置（用于读操作）
+  slavePool = mysql.createPool({
+    host: process.env.DB_SLAVE_HOST || '120.26.113.14',
+    port: process.env.DB_SLAVE_PORT || 3306,
+    user: process.env.DB_SLAVE_USER || 'app_read',
+    password: process.env.DB_SLAVE_PASSWORD || 'StrongPassword123!',
+    database: process.env.DB_NAME || 'nodeBase',
+    waitForConnections: true,
+    connectionLimit: process.env.DB_SLAVE_CONNECTION_LIMIT || 10,
+    queueLimit: 10,
+    acquireTimeout: 60000,
+    connectTimeout: 30000,
+    timeout: 60000,
+    idleTimeout: 60000,
+    keepAliveInitialDelay: 10000,
+    enableKeepAlive: true,
+    resetAfterUse: true
+  });
+} else {
+  // 原有单数据库配置
+  masterPool = mysql.createPool({
+    host: '120.26.113.14',
+    port: 3306,
+    user: 'root',
+    password: 'beiqiMysql007',
+    database: 'nodeBase',
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 10,
+    acquireTimeout: 60000,
+    connectTimeout: 30000,
+    timeout: 60000,
+    idleTimeout: 60000,
+    keepAliveInitialDelay: 10000,
+    enableKeepAlive: true,
+    resetAfterUse: true
+  });
+  
+  // 如果未启用读写分离，则slavePool指向masterPool
+  slavePool = masterPool;
+}
+
+// 监听连接事件
+masterPool.on('connection', (connection) => {
+  console.log('Master Database Connection established');
 });
 
-// 测试连接池
-pool.on('connection', (connection) => {
-  console.log('Database Connection established');
+masterPool.on('release', (connection) => {
+  console.log('Master Connection %d released', connection.threadId);
 });
 
-pool.on('release', (connection) => {
-  console.log('Connection %d released', connection.threadId);
+slavePool.on('connection', (connection) => {
+  console.log('Slave Database Connection established');
 });
 
-pool.on('error', (err) => {
-  console.error('Database pool error:', err);
+slavePool.on('release', (connection) => {
+  console.log('Slave Connection %d released', connection.threadId);
+});
+
+masterPool.on('error', (err) => {
+  console.error('Master Database pool error:', err);
+});
+
+slavePool.on('error', (err) => {
+  console.error('Slave Database pool error:', err);
 });
 
 module.exports = {
-  pool
+  masterPool,
+  slavePool,
+  isReadWriteSplitEnabled
 };

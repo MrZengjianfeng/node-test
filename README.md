@@ -1,3 +1,74 @@
+# Node.js 应用
+
+这是一个基于 Node.js、Express 和 MySQL 构建的应用程序。
+
+## 功能特性
+
+- Express.js 服务器
+- MySQL 数据库连接
+- 支持数据库读写分离
+- RESTful API 设计
+- CORS 支持
+
+## 快速开始
+
+1. 安装依赖：
+   ```
+   npm install
+   ```
+
+2. 配置数据库：
+   复制 [.env.example](file:///E:/WebstormProjects/node-test/.env.example) 文件为 `.env` 并按需修改其中的配置项
+
+3. 启动服务：
+   ```
+   npm start
+   ```
+
+## 数据库读写分离配置
+
+本系统支持数据库读写分离功能，可以通过环境变量控制：
+
+- `DB_READ_WRITE_SPLIT`: 是否开启读写分离 (true/false)
+- `DB_MASTER_HOST`: 主库地址 (用于写操作)
+- `DB_SLAVE_HOST`: 从库地址 (用于读操作)
+
+当 `DB_READ_WRITE_SPLIT` 设置为 `true` 时，系统会分别建立主库和从库连接池：
+- 写操作（INSERT、UPDATE、DELETE）会使用主库连接池
+- 读操作（SELECT）会使用从库连接池
+
+如果设置为 `false` 或不设置，则使用单一数据库配置，所有操作都在同一个数据库上执行。
+
+在使用读写分离时，请确保：
+1. 主从数据库之间已正确配置复制关系
+2. 从库能够正常同步主库数据
+3. 网络连接正常，可以同时访问主从数据库
+
+## Service 层使用读写分离
+
+在 Service 层中，我们已经实现了读写分离的调用方式：
+
+1. **读操作**：使用 `executeRead()` 方法执行 SELECT 查询
+2. **写操作**：使用 `executeWrite()` 方法执行 INSERT/UPDATE/DELETE 操作
+3. **事务操作**：使用 `executeTransaction()` 方法执行多步骤的原子操作
+
+示例：
+```javascript
+// 读操作
+const users = await executeRead('SELECT * FROM users WHERE status = ?', ['active']);
+
+// 写操作
+const result = await executeWrite('INSERT INTO users (name, email) VALUES (?, ?)', [name, email]);
+
+// 事务操作
+const results = await executeTransaction(async (connection) => {
+  // 在事务中执行多个操作
+  const [result1] = await connection.execute('INSERT INTO users (name) VALUES (?)', [name]);
+  const [result2] = await connection.execute('UPDATE profiles SET user_id = ? WHERE id = ?', [result1.insertId, profileId]);
+  return [result1, result2];
+});
+```
+
 # Node.js 项目说明文档
 
 本项目是一个基于 Express 的 RESTful API 服务，采用了分层架构设计，类似于 Java Spring 项目的结构组织代码，实现清晰的分层架构。
