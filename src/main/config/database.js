@@ -8,11 +8,11 @@ let masterPool, slavePool;
 if (isReadWriteSplitEnabled) {
   // 主库配置（用于写操作）
   masterPool = mysql.createPool({
-    host: process.env.DB_MASTER_HOST || '120.26.113.14',
-    port: process.env.DB_MASTER_PORT || 3306,
-    user: process.env.DB_MASTER_USER || 'app_write',
-    password: process.env.DB_MASTER_PASSWORD || 'StrongPassword456!',
-    database: process.env.DB_NAME || 'nodeBase',
+    host: process.env.DB_MASTER_HOST,
+    port: process.env.DB_MASTER_PORT,
+    user: process.env.DB_MASTER_USER,
+    password: process.env.DB_MASTER_PASSWORD,
+    database: process.env.DB_NAME,
     waitForConnections: true,
     connectionLimit: process.env.DB_MASTER_CONNECTION_LIMIT || 10,
     queueLimit: 10,
@@ -27,11 +27,11 @@ if (isReadWriteSplitEnabled) {
 
   // 从库配置（用于读操作）
   slavePool = mysql.createPool({
-    host: process.env.DB_SLAVE_HOST || '120.26.113.14',
-    port: process.env.DB_SLAVE_PORT || 3306,
-    user: process.env.DB_SLAVE_USER || 'app_read',
-    password: process.env.DB_SLAVE_PASSWORD || 'StrongPassword123!',
-    database: process.env.DB_NAME || 'nodeBase',
+    host: process.env.DB_SLAVE_HOST,
+    port: process.env.DB_SLAVE_PORT,
+    user: process.env.DB_SLAVE_USER,
+    password: process.env.DB_SLAVE_PASSWORD,
+    database: process.env.DB_NAME,
     waitForConnections: true,
     connectionLimit: process.env.DB_SLAVE_CONNECTION_LIMIT || 10,
     queueLimit: 10,
@@ -44,13 +44,13 @@ if (isReadWriteSplitEnabled) {
     resetAfterUse: true
   });
 } else {
-  // 原有单数据库配置
+  // 单数据库配置
   masterPool = mysql.createPool({
-    host: '120.26.113.14',
-    port: 3306,
-    user: 'root',
-    password: 'beiqiMysql007',
-    database: 'nodeBase',
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 10,
