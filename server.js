@@ -2,14 +2,27 @@ require('dotenv').config(); // 加载环境变量
 
 const express = require('express');
 const cors = require('cors');
+const helmet = require('helmet'); // 安全头部中间件
+
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// 添加安全头部
+app.use(helmet());
 
 // Middleware to parse JSON bodies
 app.use(express.json());
 
-// Enable CORS for all routes
+// 启用CORS
 app.use(cors());
+
+// 引入数据清理中间件
+const { sanitizeBody, sanitizeQuery, sanitizeParams } = require('./src/main/middleware/sanitization');
+
+// 应用数据清理中间件
+app.use(sanitizeBody);
+app.use(sanitizeQuery);
+app.use(sanitizeParams);
 
 // 引入API路由
 const apiRouter = require('./src/main/config/routes');

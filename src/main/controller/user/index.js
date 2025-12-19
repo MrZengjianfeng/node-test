@@ -1,5 +1,6 @@
 const express = require('express');
 const userService = require('../../service/userService');
+const { userValidators } = require('../../middleware/validation');
 const router = express.Router();
 
 // 获取用户列表
@@ -22,7 +23,7 @@ router.get('/user/list', async (req, res) => {
 });
 
 // 分页获取用户列表
-router.get('/user/listPage', async (req, res) => {
+router.get('/user/listPage', userValidators.listPage, async (req, res) => {
   try {
     const { page = 1, size = 10 } = req.query;
     const result = await userService.getUserListPage(parseInt(page), parseInt(size));
@@ -61,30 +62,10 @@ router.get('/user/groupByBillStatus', async (req, res) => {
 });
 
 // 保存用户信息数组
-router.post('/user/doSave', async (req, res) => {
+router.post('/user/doSave', userValidators.saveUserArray, async (req, res) => {
   try {
     // 获取请求体中的用户数组
     const userArray = req.body;
-    
-    // 验证请求体是否为数组
-    if (!Array.isArray(userArray)) {
-      return res.status(400).json({
-        code: 400,
-        data: null,
-        message: 'Request body must be an array of users'
-      });
-    }
-    
-    // 验证每个用户对象
-    for (const [index, user] of userArray.entries()) {
-      if (!user.name || !user.age || !user.gender) {
-        return res.status(400).json({
-          code: 400,
-          data: null,
-          message: `User at index ${index} must include name, age, and gender`
-        });
-      }
-    }
     
     // 调用服务保存用户数组
     const result = await userService.saveUserArray(userArray);

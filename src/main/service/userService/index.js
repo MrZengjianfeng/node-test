@@ -15,11 +15,14 @@ class UserService {
   // 分页获取用户列表
   async getUserListPage(page = 1, size = 10) {
     try {
-      const offset = (page - 1) * size;
+      // 确保参数是数字类型
+      const pageNum = parseInt(page);
+      const pageSize = parseInt(size);
+      const offset = (pageNum - 1) * pageSize;
       
       const rows = await executeRead(
         'SELECT * FROM user LIMIT ? OFFSET ?',
-        [size, offset]
+        [pageSize, offset]
       );
       
       const [countResult] = await executeRead('SELECT COUNT(*) as total FROM user');
@@ -27,8 +30,8 @@ class UserService {
       return {
         list: rows,
         total: countResult.total,
-        page: page,
-        size: size
+        page: pageNum,
+        size: pageSize
       };
     } catch (error) {
       throw new Error('Failed to fetch user list with pagination: ' + error.message);
@@ -62,6 +65,7 @@ class UserService {
     try {
       const { name, age, gender, permission, email } = userData;
       
+      // 使用参数化查询防止SQL注入
       const result = await executeWrite(
         'INSERT INTO user (name, age, gender, permission, email) VALUES (?, ?, ?, ?, ?)',
         [name, age, gender, permission, email]
@@ -84,6 +88,7 @@ class UserService {
         for (const user of userArray) {
           const { name, age, gender, permission, email } = user;
           
+          // 使用参数化查询防止SQL注入
           const [result] = await connection.execute(
             'INSERT INTO user (name, age, gender, permission, email) VALUES (?, ?, ?, ?, ?)',
             [name, age, gender, permission, email || null]
