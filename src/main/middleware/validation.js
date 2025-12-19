@@ -48,7 +48,52 @@ const userValidators = {
   ]
 };
 
+// 系统相关验证规则
+const systemValidators = {
+  // 系统列表分页参数验证
+  listPage: [
+    query('page').optional().isInt({ min: 1 }).withMessage('页码必须是大于0的整数'),
+    query('size').optional().isInt({ min: 1, max: 100 }).withMessage('每页大小必须是1-100之间的整数'),
+    handleValidationErrors
+  ]
+};
+
+// 订单相关验证规则
+const orderValidators = {
+  // 订单列表分页参数验证
+  listPage: [
+    query('page').optional().isInt({ min: 1 }).withMessage('页码必须是大于0的整数'),
+    query('size').optional().isInt({ min: 1, max: 100 }).withMessage('每页大小必须是1-100之间的整数'),
+    handleValidationErrors
+  ],
+  
+  // 订单ID参数验证
+  orderId: [
+    param('id').isInt({ min: 1 }).withMessage('订单ID必须是大于0的整数'),
+    handleValidationErrors
+  ],
+  
+  // 创建订单验证
+  createOrder: [
+    body('userId').isInt({ min: 1 }).withMessage('用户ID必须是大于0的整数'),
+    body('amount').isFloat({ min: 0 }).withMessage('金额必须是非负数'),
+    body('status').isIn(['pending', 'completed', 'cancelled']).withMessage('状态只能是 pending, completed, cancelled 中的一种'),
+    handleValidationErrors
+  ],
+  
+  // 更新订单验证
+  updateOrder: [
+    param('id').isInt({ min: 1 }).withMessage('订单ID必须是大于0的整数'),
+    body('userId').optional().isInt({ min: 1 }).withMessage('用户ID必须是大于0的整数'),
+    body('amount').optional().isFloat({ min: 0 }).withMessage('金额必须是非负数'),
+    body('status').optional().isIn(['pending', 'completed', 'cancelled']).withMessage('状态只能是 pending, completed, cancelled 中的一种'),
+    handleValidationErrors
+  ]
+};
+
 module.exports = {
   userValidators,
+  systemValidators,
+  orderValidators,
   handleValidationErrors
 };

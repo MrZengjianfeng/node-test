@@ -16,10 +16,22 @@ app.use(express.json());
 // 启用CORS
 app.use(cors());
 
-// 引入数据清理中间件
+// 引入数据清理中间件（主要用于XSS防护）
 const { sanitizeBody, sanitizeQuery, sanitizeParams } = require('./src/main/middleware/sanitization');
 
-// 应用数据清理中间件
+// 引入SQL注入防护中间件
+const { 
+  protectBodyFromSqlInjection, 
+  protectQueryFromSqlInjection, 
+  protectParamsFromSqlInjection 
+} = require('./src/main/middleware/sqlProtection');
+
+// 应用SQL注入防护中间件（放在数据清理之前）
+app.use(protectBodyFromSqlInjection);
+app.use(protectQueryFromSqlInjection);
+app.use(protectParamsFromSqlInjection);
+
+// 应用数据清理中间件（主要用于XSS防护）
 app.use(sanitizeBody);
 app.use(sanitizeQuery);
 app.use(sanitizeParams);

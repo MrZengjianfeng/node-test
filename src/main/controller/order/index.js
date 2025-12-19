@@ -1,10 +1,12 @@
 const express = require('express');
 const orderService = require('../../service/orderService');
+const { orderValidators } = require('../../middleware/validation');
 const router = express.Router();
 
 // 获取订单列表
-router.get('/list', async (req, res) => {
+router.get('/list', orderValidators.listPage, async (req, res) => {
   try {
+    const { page = 1, size = 10 } = req.sanitizedQuery; // 使用清理后的查询参数
     const orderList = await orderService.getOrderList();
     res.json({
       code: 200,
@@ -21,9 +23,9 @@ router.get('/list', async (req, res) => {
 });
 
 // 获取订单详情
-router.get('/detail/:id', async (req, res) => {
+router.get('/detail/:id', orderValidators.orderId, async (req, res) => {
   try {
-    const orderId = req.params.id;
+    const orderId = req.sanitizedParams.id; // 使用清理后的参数
     const orderDetail = await orderService.getOrderById(orderId);
     
     if (!orderDetail) {
@@ -49,9 +51,9 @@ router.get('/detail/:id', async (req, res) => {
 });
 
 // 创建订单
-router.post('/create', async (req, res) => {
+router.post('/create', orderValidators.createOrder, async (req, res) => {
   try {
-    const orderData = req.body;
+    const orderData = req.sanitizedBody; // 使用清理后的请求体
     const result = await orderService.createOrder(orderData);
     
     res.json({
@@ -69,10 +71,10 @@ router.post('/create', async (req, res) => {
 });
 
 // 更新订单
-router.put('/update/:id', async (req, res) => {
+router.put('/update/:id', orderValidators.updateOrder, async (req, res) => {
   try {
-    const orderId = req.params.id;
-    const orderData = req.body;
+    const orderId = req.sanitizedParams.id; // 使用清理后的参数
+    const orderData = req.sanitizedBody; // 使用清理后的请求体
     const result = await orderService.updateOrder(orderId, orderData);
     
     res.json({

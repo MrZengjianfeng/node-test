@@ -1,7 +1,7 @@
 /**
  * 数据库读写分离工具类
  */
-const { masterPool, slavePool } = require('../config/database');
+const { masterPool, slavePool } = require("../config/database");
 
 /**
  * 转义特殊字符以防止SQL注入
@@ -9,7 +9,7 @@ const { masterPool, slavePool } = require('../config/database');
  * @returns {string} 转义后的字符串
  */
 function escapeString(str) {
-  if (typeof str !== 'string') {
+  if (typeof str !== "string") {
     return str;
   }
   return str.replace(/[\0\x08\x09\x1a\n\r"'\\\%]/g, function (char) {
@@ -26,7 +26,7 @@ function escapeString(str) {
         return "\\n";
       case "\r":
         return "\\r";
-      case "\"":
+      case '"':
       case "'":
       case "\\":
       case "%":
@@ -50,7 +50,7 @@ async function executeWrite(sql, params = []) {
     const [results] = await connection.execute(sql, params);
     return results;
   } catch (error) {
-    console.error('Write operation failed:', error.message);
+    console.error("Write operation failed:", error.message);
     throw error;
   } finally {
     if (connection) connection.release();
@@ -70,7 +70,7 @@ async function executeRead(sql, params = []) {
     const [results] = await connection.execute(sql, params);
     return results;
   } catch (error) {
-    console.error('Read operation failed:', error.message);
+    console.error("Read operation failed:", error.message);
     throw error;
   } finally {
     if (connection) connection.release();
@@ -87,14 +87,14 @@ async function executeTransaction(transactionFunction) {
   try {
     connection = await masterPool.getConnection();
     await connection.beginTransaction();
-    
+
     const result = await transactionFunction(connection);
-    
+
     await connection.commit();
     return result;
   } catch (error) {
     if (connection) await connection.rollback();
-    console.error('Transaction failed:', error.message);
+    console.error("Transaction failed:", error.message);
     throw error;
   } finally {
     if (connection) connection.release();
@@ -105,5 +105,5 @@ module.exports = {
   executeWrite,
   executeRead,
   executeTransaction,
-  escapeString
+  escapeString,
 };

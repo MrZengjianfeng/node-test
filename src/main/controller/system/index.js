@@ -1,5 +1,6 @@
 const express = require('express');
 const systemService = require('../../service/systemService');
+const { systemValidators } = require('../../middleware/validation');
 const router = express.Router();
 
 // 获取系统列表
@@ -22,9 +23,9 @@ router.get('/list', (req, res) => {
 });
 
 // 分页获取系统列表
-router.get('/listPage', (req, res) => {
+router.get('/listPage', systemValidators.listPage, (req, res) => {
   try {
-    const { page = 1, size = 10 } = req.query;
+    const { page = 1, size = 10 } = req.sanitizedQuery; // 使用清理后的查询参数
     const result = systemService.getSystemListPage(parseInt(page), parseInt(size));
 
     res.json({

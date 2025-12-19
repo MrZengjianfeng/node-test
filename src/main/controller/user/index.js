@@ -25,7 +25,7 @@ router.get('/list', async (req, res) => {
 // 分页获取用户列表
 router.get('/listPage', userValidators.listPage, async (req, res) => {
   try {
-    const { page = 1, size = 10 } = req.query;
+    const { page = 1, size = 10 } = req.sanitizedQuery; // 使用清理后的查询参数
     const result = await userService.getUserListPage(parseInt(page), parseInt(size));
 
     res.json({
@@ -64,8 +64,8 @@ router.get('/groupByBillStatus', async (req, res) => {
 // 保存用户信息数组
 router.post('/doSave', userValidators.saveUserArray, async (req, res) => {
   try {
-    // 获取请求体中的用户数组
-    const userArray = req.body;
+    // 使用经过验证和清理的数据
+    const userArray = req.sanitizedBody; // 使用清理后的请求体
     
     // 调用服务保存用户数组
     const result = await userService.saveUserArray(userArray);
