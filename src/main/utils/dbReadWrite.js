@@ -67,6 +67,7 @@ async function executeRead(sql, params = []) {
   let connection;
   try {
     connection = await slavePool.getConnection();
+    console.log("connection:", connection)
     const [results] = await connection.execute(sql, params);
     return results;
   } catch (error) {

@@ -1,7 +1,6 @@
 require('dotenv').config({ path: '.env.example' }); // 加载环境变量
 
 const express = require('express');
-const cors = require('cors');
 const helmet = require('helmet'); // 安全头部中间件
 
 const app = express();
@@ -14,27 +13,8 @@ app.use(helmet());
 app.use(express.json());
 
 // 启用CORS
-app.use(cors());
-
-// 引入数据清理中间件（主要用于XSS防护）
-const { sanitizeBody, sanitizeQuery, sanitizeParams } = require('./src/main/middleware/sanitization');
-
-// 引入SQL注入防护中间件
-const { 
-  protectBodyFromSqlInjection, 
-  protectQueryFromSqlInjection, 
-  protectParamsFromSqlInjection 
-} = require('./src/main/middleware/sqlProtection');
-
-// 应用SQL注入防护中间件（放在数据清理之前）
-app.use(protectBodyFromSqlInjection);
-app.use(protectQueryFromSqlInjection);
-app.use(protectParamsFromSqlInjection);
-
-// 应用数据清理中间件（主要用于XSS防护）
-app.use(sanitizeBody);
-app.use(sanitizeQuery);
-app.use(sanitizeParams);
+const { corsMiddleware } = require('./src/main/config/cors');
+app.use(corsMiddleware);
 
 // 引入API路由
 const apiRouter = require('./src/main/config/routes');
@@ -54,28 +34,28 @@ setInterval(async () => {
 
 // Start the server
 const server = app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-  console.log(`Visit http://localhost:${PORT} in your browser`);
+  console.log(`服务器在端口上运行 ${PORT}`);
+  console.log(`访问 http://localhost:${PORT} 在浏览器中`);
   
   // 显示数据库读写分离状态
   const { isReadWriteSplitEnabled } = require('./src/main/config/database');
   if (isReadWriteSplitEnabled) {
-    console.log('Database Read/Write Split: ENABLED');
-    console.log(`Master DB: ${process.env.DB_MASTER_HOST || 'default'}`);
-    console.log(`Slave DB: ${process.env.DB_SLAVE_HOST || 'default'}`);
+    console.log('数据库读写分离：启用');
+    console.log(`主数据库: ${process.env.DB_MASTER_HOST || '默认的'}`);
+    console.log(`从数据库：: ${process.env.DB_SLAVE_HOST || '默认的'}`);
   } else {
-    console.log('Database Read/Write Split: DISABLED');
+    console.log('数据库读写分离：关闭');
   }
 });
 
 // 优雅关闭
 process.on('SIGINT', async () => {
-  console.log('Shutting down gracefully...');
+  console.log('优雅地关机...');
   await masterPool.end();
   if (slavePool !== masterPool) {
     await slavePool.end();
   }
   server.close(() => {
-    console.log('Process terminated');
+    console.log('进程终止');
   });
 });

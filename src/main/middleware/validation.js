@@ -1,5 +1,39 @@
 const { body, query, param, validationResult } = require("express-validator");
 
+// 将验证后的数据映射到sanitized属性
+const sanitizeRequestData = (req, res, next) => {
+  // 获取验证结果
+  const result = validationResult(req);
+  if (!result.isEmpty()) {
+    // 如果验证失败，仍然继续执行，但错误处理在下一个中间件中
+    next();
+    return;
+  }
+
+  // 创建sanitizedQuery，基于原始查询参数和验证结果
+  req.sanitizedQuery = {};
+  if (req.query.page !== undefined) {
+    req.sanitizedQuery.page = req.query.page;
+  }
+  if (req.query.size !== undefined) {
+    req.sanitizedQuery.size = req.query.size;
+  }
+  // 添加其他可能的查询参数
+  Object.keys(req.query).forEach(key => {
+    if (!(key in req.sanitizedQuery)) {
+      req.sanitizedQuery[key] = req.query[key];
+    }
+  });
+
+  // 创建sanitizedBody
+  req.sanitizedBody = req.body;
+
+  // 创建sanitizedParams
+  req.sanitizedParams = req.params;
+
+  next();
+};
+
 // 统一错误处理中间件
 const handleValidationErrors = (req, res, next) => {
   const errors = validationResult(req);
@@ -26,6 +60,7 @@ const userValidators = {
       .optional()
       .isInt({ min: 1, max: 100 })
       .withMessage("每页大小必须是1-100之间的整数"),
+    sanitizeRequestData,
     handleValidationErrors,
   ],
 
@@ -42,6 +77,7 @@ const userValidators = {
     body("gender").isIn(["男", "女"]).withMessage("性别只能是男或女"),
     body("permission").optional().isIn([0, 1]).withMessage("权限只能是0或1"),
     body("email").optional().isEmail().withMessage("邮箱格式不正确"),
+    sanitizeRequestData,
     handleValidationErrors,
   ],
 
@@ -60,6 +96,7 @@ const userValidators = {
     body("*.gender").isIn(["男", "女"]).withMessage("性别只能是男或女"),
     body("*.permission").optional().isIn([0, 1]).withMessage("权限只能是0或1"),
     body("*.email").optional().isEmail().withMessage("邮箱格式不正确"),
+    sanitizeRequestData,
     handleValidationErrors,
   ],
 };
@@ -76,6 +113,7 @@ const systemValidators = {
       .optional()
       .isInt({ min: 1, max: 100 })
       .withMessage("每页大小必须是1-100之间的整数"),
+    sanitizeRequestData,
     handleValidationErrors,
   ],
 };
@@ -92,12 +130,14 @@ const orderValidators = {
       .optional()
       .isInt({ min: 1, max: 100 })
       .withMessage("每页大小必须是1-100之间的整数"),
+    sanitizeRequestData,
     handleValidationErrors,
   ],
 
   // 订单ID参数验证
   orderId: [
     param("id").isInt({ min: 1 }).withMessage("订单ID必须是大于0的整数"),
+    sanitizeRequestData,
     handleValidationErrors,
   ],
 
@@ -108,6 +148,7 @@ const orderValidators = {
     body("status")
       .isIn(["pending", "completed", "cancelled"])
       .withMessage("状态只能是 pending, completed, cancelled 中的一种"),
+    sanitizeRequestData,
     handleValidationErrors,
   ],
 
@@ -126,6 +167,7 @@ const orderValidators = {
       .optional()
       .isIn(["pending", "completed", "cancelled"])
       .withMessage("状态只能是 pending, completed, cancelled 中的一种"),
+    sanitizeRequestData,
     handleValidationErrors,
   ],
 };

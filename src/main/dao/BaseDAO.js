@@ -21,13 +21,13 @@ class BaseDAO {
     const pageSize = parseInt(size);
     const offset = (pageNum - 1) * pageSize;
 
+    // 直接拼接数字到 SQL（因为 LIMIT/OFFSET 不支持参数绑定）
     const rows = await executeRead(
-      `SELECT * FROM ${this.tableName} LIMIT ? OFFSET ?`,
-      [pageSize, offset]
+        `SELECT * FROM ${this.tableName} LIMIT ${pageSize} OFFSET ${offset}`
     );
 
     const [countResult] = await executeRead(
-      `SELECT COUNT(*) as total FROM ${this.tableName}`
+        `SELECT COUNT(*) as total FROM ${this.tableName}`
     );
 
     return {

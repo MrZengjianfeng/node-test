@@ -8,13 +8,19 @@
 - MySQL 数据库连接
 - 支持数据库读写分离
 - RESTful API 设计
-- CORS 支持
+- CORS 跨域支持
 
 ## 快速开始
 
 1. 安装依赖：
    ```
    npm install
+   ```
+
+2. 配置CORS（跨域资源共享）：
+   如需指定允许访问的前端域名，请修改 [.env.example](file:///E:/WebstormProjects/node-test/.env.example) 文件中的 `ALLOWED_ORIGINS` 变量，例如：
+   ```
+   ALLOWED_ORIGINS=http://localhost:3000,http://localhost:8080,http://127.0.0.1:3000
    ```
 
 2. 配置数据库：
@@ -185,3 +191,65 @@ Get-Process node | Stop-Process
 ```
 
 也可以直接使用任务管理器来结束 Node.js 进程。
+
+## CORS 配置说明
+
+本项目已配置CORS（跨域资源共享），支持前端应用跨域访问API接口。
+
+### 配置方式
+
+1. CORS配置位于 `src/main/config/cors.js` 文件中
+2. 允许的域名配置在 [.env.example](file:///E:/WebstormProjects/node-test/.env.example) 文件的 `ALLOWED_ORIGINS` 变量中
+
+### 环境变量配置
+
+修改 [.env.example](file:///E:/WebstormProjects/node-test/.env.example) 文件中的 `ALLOWED_ORIGINS` 变量，用逗号分隔多个域名：
+
+```
+ALLOWED_ORIGINS=http://localhost:3000,http://localhost:8080,http://localhost:3001
+```
+
+### 默认配置
+
+如果未设置 `ALLOWED_ORIGINS` 环境变量，系统将使用以下默认域名：
+
+- `http://localhost:3000`
+- `http://localhost:3001`
+- `http://localhost:8080`
+- `http://127.0.0.1:3000`
+- `http://127.0.0.1:3001`
+- `http://127.0.0.1:8080`
+
+### 支持的HTTP方法
+
+- GET
+- POST
+- PUT
+- DELETE
+- OPTIONS
+- PATCH
+
+### 支持的请求头
+
+- Content-Type
+- Authorization
+- X-Requested-With
+- Accept
+- X-HTTP-Method-Override
+
+### 特性
+
+- 允许携带认证信息（credentials: true）
+- 预检请求成功状态码为200
+- 支持自定义配置
+
+### 使用方法
+
+启动服务后，前端应用可以从配置的域名访问API接口：
+
+```javascript
+fetch('http://localhost:3000/api/users', {
+  method: 'GET',
+  credentials: 'include' // 如果需要携带认证信息
+})
+```

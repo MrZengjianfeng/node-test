@@ -25,6 +25,8 @@ router.get("/list", async (req, res) => {
 // 分页获取用户列表
 router.get("/listPage", userValidators.listPage, async (req, res) => {
   try {
+    console.log('req.sanitizedQuery:',req.sanitizedQuery)
+    debugger; // 断点：当请求到达此接口时会在此暂停
     const { page = 1, size = 10 } = req.sanitizedQuery; // 使用清理后的查询参数
     const result = await userService.getUserListPage(
       parseInt(page),

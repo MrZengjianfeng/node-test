@@ -74,27 +74,28 @@ if (isReadWriteSplitEnabled) {
 
 // 监听连接事件
 masterPool.on("connection", (connection) => {
-  console.log("Master Database Connection established");
+  console.log("建立主数据库连接");
 });
 
 masterPool.on("release", (connection) => {
   console.log("Master Connection %d released", connection.threadId);
 });
 
+masterPool.on("error", (err) => {
+  console.error("主数据库池错误:", err);
+});
+
+
 slavePool.on("connection", (connection) => {
-  console.log("Slave Database Connection established");
+  console.log("建立从数据库连接");
 });
 
 slavePool.on("release", (connection) => {
   console.log("Slave Connection %d released", connection.threadId);
 });
 
-masterPool.on("error", (err) => {
-  console.error("Master Database pool error:", err);
-});
-
 slavePool.on("error", (err) => {
-  console.error("Slave Database pool error:", err);
+  console.error("从数据库池错误:", err);
 });
 
 module.exports = {

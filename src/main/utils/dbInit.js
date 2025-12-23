@@ -8,12 +8,12 @@ async function initDatabase() {
     connection = await masterPool.getConnection();
     const [rows] = await connection.query("SELECT 1");
     if (rows.length > 0) {
-      console.log("Master database initialized successfully");
+      console.log("主数据库初始化成功");
     } else {
-      console.log("Master database initialized Failed");
+      console.log("主数据库初始化失败");
     }
   } catch (error) {
-    console.error("Failed to initialize master database:", error.message);
+    console.error("初始化主数据库失败:", error.message);
   } finally {
     if (connection) connection.release();
   }
@@ -24,12 +24,12 @@ async function initDatabase() {
       connection = await slavePool.getConnection();
       const [rows] = await connection.query("SELECT 1");
       if (rows.length > 0) {
-        console.log("Slave database initialized successfully");
+        console.log("从数据库初始化成功");
       } else {
-        console.log("Slave database initialized Failed");
+        console.log("从数据库初始化失败");
       }
     } catch (error) {
-      console.error("Failed to initialize slave database:", error.message);
+      console.error("初始化从数据库失败:", error.message);
     } finally {
       if (connection) connection.release();
     }
@@ -42,10 +42,10 @@ async function testConnectionPool() {
   try {
     connection = await masterPool.getConnection();
     await connection.ping();
-    console.log("Master database connection pool is healthy");
+    console.log("主数据库连接池运行正常");
   } catch (error) {
     console.error(
-      "Master database connection pool health check failed:",
+      "主数据库连接池运行状况检查失败:",
       error.message
     );
   } finally {
@@ -57,10 +57,10 @@ async function testConnectionPool() {
     try {
       connection = await slavePool.getConnection();
       await connection.ping();
-      console.log("Slave database connection pool is healthy");
+      console.log("从数据库连接池运行正常");
     } catch (error) {
       console.error(
-        "Slave database connection pool health check failed:",
+        "从数据库连接池健康检查失败:",
         error.message
       );
     } finally {
