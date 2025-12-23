@@ -1,11 +1,10 @@
-const { executeRead, executeWrite } = require("../../utils/dbReadWrite");
+const orderDao = require("../../dao/orderDao");
 
 class OrderService {
   // 获取订单列表
   async getOrderList() {
     try {
-      // 使用参数化查询防止SQL注入
-      const rows = await executeRead("SELECT * FROM orders");
+      const rows = await orderDao.getOrderList();
       return rows;
     } catch (error) {
       throw new Error("Failed to fetch order list: " + error.message);
@@ -17,24 +16,9 @@ class OrderService {
     try {
       const pageNum = parseInt(page);
       const pageSize = parseInt(size);
-      const offset = (pageNum - 1) * pageSize;
 
-      // 使用参数化查询防止SQL注入
-      const rows = await executeRead("SELECT * FROM orders LIMIT ? OFFSET ?", [
-        pageSize,
-        offset,
-      ]);
-
-      const [countResult] = await executeRead(
-        "SELECT COUNT(*) as total FROM orders"
-      );
-
-      return {
-        list: rows,
-        total: countResult.total,
-        page: pageNum,
-        size: pageSize,
-      };
+      const result = await orderDao.getOrderListPage(pageNum, pageSize);
+      return result;
     } catch (error) {
       throw new Error(
         "Failed to fetch order list with pagination: " + error.message
@@ -45,11 +29,8 @@ class OrderService {
   // 根据ID获取订单详情
   async getOrderById(orderId) {
     try {
-      // 使用参数化查询防止SQL注入
-      const rows = await executeRead("SELECT * FROM orders WHERE id = ?", [
-        orderId,
-      ]);
-      return rows.length > 0 ? rows[0] : null;
+      const order = await orderDao.getOrderById(orderId);
+      return order;
     } catch (error) {
       throw new Error("Failed to fetch order: " + error.message);
     }
@@ -58,12 +39,7 @@ class OrderService {
   // 创建订单
   async createOrder(orderData) {
     try {
-      const { userId, amount, status } = orderData;
-      // 使用参数化查询防止SQL注入
-      const result = await executeWrite(
-        "INSERT INTO orders (userId, amount, status) VALUES (?, ?, ?)",
-        [userId, amount, status]
-      );
+      const result = await orderDao.createOrder(orderData);
       return result;
     } catch (error) {
       throw new Error("Failed to create order: " + error.message);
@@ -73,12 +49,7 @@ class OrderService {
   // 更新订单
   async updateOrder(orderId, orderData) {
     try {
-      const { userId, amount, status } = orderData;
-      // 使用参数化查询防止SQL注入
-      const result = await executeWrite(
-        "UPDATE orders SET userId = ?, amount = ?, status = ? WHERE id = ?",
-        [userId, amount, status, orderId]
-      );
+      const result = await orderDao.updateOrder(orderId, orderData);
       return result;
     } catch (error) {
       throw new Error("Failed to update order: " + error.message);

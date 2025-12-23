@@ -1,4 +1,4 @@
-require('dotenv').config(); // 加载环境变量
+require('dotenv').config({ path: '.env.example' }); // 加载环境变量
 
 const express = require('express');
 const cors = require('cors');

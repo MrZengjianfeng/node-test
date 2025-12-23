@@ -1,34 +1,37 @@
-const systemDao = require("../../dao/systemDao");
+const BaseDAO = require("../BaseDAO");
 
-class SystemService {
+class SystemDAO extends BaseDAO {
+  constructor() {
+    // 使用'systems'作为表名，如果系统表存在的话
+    super("systems");
+  }
+
   // 获取系统列表
   async getSystemList() {
     try {
-      const systemList = await systemDao.getSystemList();
-      return systemList;
+      return await this.findAll();
     } catch (error) {
-      // 如果数据库操作失败，回退到模拟数据
-      console.warn("Failed to fetch system list from database:", error.message);
-      // 模拟数据
-      const systemList = [
+      // 如果表不存在，返回模拟数据
+      console.warn(
+        "Systems table not found, returning mock data:",
+        error.message
+      );
+      return [
         { id: 1, name: "Authentication Service", status: "active" },
         { id: 2, name: "Payment Service", status: "active" },
         { id: 3, name: "Notification Service", status: "inactive" },
       ];
-
-      return systemList;
     }
   }
 
   // 分页获取系统列表
   async getSystemListPage(page = 1, size = 10) {
     try {
-      const result = await systemDao.getSystemListPage(page, size);
-      return result;
+      return await this.findByPage(page, size);
     } catch (error) {
-      // 如果数据库操作失败，回退到模拟数据
+      // 如果表不存在，返回模拟数据的分页结果
       console.warn(
-        "Failed to fetch system list with pagination from database:",
+        "Systems table not found, returning mock data:",
         error.message
       );
       const systemList = [
@@ -53,16 +56,22 @@ class SystemService {
   // 根据状态分组系统信息
   async getSystemsGroupedByStatus() {
     try {
-      const groupedData = await systemDao.getSystemsGroupedByStatus();
-      return groupedData;
+      const allSystems = await this.findAll();
+
+      const active = allSystems.filter((sys) => sys.status === "active");
+      const inactive = allSystems.filter((sys) => sys.status === "inactive");
+      const maintenance = allSystems.filter(
+        (sys) => sys.status === "maintenance"
+      );
+
+      return { active, inactive, maintenance };
     } catch (error) {
-      // 如果数据库操作失败，回退到模拟数据
+      // 如果表不存在，返回模拟数据
       console.warn(
-        "Failed to fetch system groups from database:",
+        "Systems table not found, returning mock data:",
         error.message
       );
-      // 模拟按状态分组的数据
-      const groupedData = {
+      return {
         active: [
           { id: 1, name: "Authentication Service" },
           { id: 2, name: "Payment Service" },
@@ -70,10 +79,8 @@ class SystemService {
         inactive: [{ id: 3, name: "Notification Service" }],
         maintenance: [],
       };
-
-      return groupedData;
     }
   }
 }
 
-module.exports = new SystemService();
+module.exports = new SystemDAO();

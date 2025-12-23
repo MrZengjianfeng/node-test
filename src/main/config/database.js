@@ -5,6 +5,11 @@ const isReadWriteSplitEnabled = process.env.DB_READ_WRITE_SPLIT === "true";
 
 let masterPool, slavePool;
 
+console.log('isReadWriteSplitEnabled:',isReadWriteSplitEnabled)
+console.log('process.env.DB_MASTER_HOST:',process.env.DB_MASTER_HOST)
+console.log('process.env.DB_MASTER_PORT:',process.env.DB_MASTER_PORT)
+console.log('process.env.DB_MASTER_USER:',process.env.DB_MASTER_USER)
+
 if (isReadWriteSplitEnabled) {
   // 主库配置（用于写操作）
   masterPool = mysql.createPool({
